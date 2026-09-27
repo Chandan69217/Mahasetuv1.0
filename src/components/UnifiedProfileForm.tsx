@@ -67,13 +67,21 @@ export const UnifiedProfileForm: React.FC<Props> = ({
 
   // Socio-Economic
   const [category, setCategory] = useState<'GENERAL' | 'OBC' | 'SC' | 'ST' | 'VJNT'>(citizen.category || 'OBC');
-  const [annualIncome, setAnnualIncome] = useState<number>(citizen.annualIncome || 0);
+  const [annualIncome, setAnnualIncome] = useState<string>(
+    citizen.annualIncome !== undefined && citizen.annualIncome !== null && citizen.annualIncome !== 0
+      ? String(citizen.annualIncome)
+      : ''
+  );
   const [rationCardType, setRationCardType] = useState<'YELLOW_BPL' | 'ORANGE' | 'WHITE'>(citizen.rationCardType || 'ORANGE');
   const [disabilityStatus, setDisabilityStatus] = useState<'NO' | 'YES'>(citizen.disabilityStatus || 'NO');
 
   // Land Details
   const [gatNumber, setGatNumber] = useState(citizen.landHolding?.gatNumber || '');
-  const [areaInAcres, setAreaInAcres] = useState<number>(citizen.landHolding?.areaInAcres || 0);
+  const [areaInAcres, setAreaInAcres] = useState<string>(
+    citizen.landHolding?.areaInAcres !== undefined && citizen.landHolding?.areaInAcres !== null && citizen.landHolding?.areaInAcres !== 0
+      ? String(citizen.landHolding.areaInAcres)
+      : ''
+  );
   const [irrigationType, setIrrigationType] = useState<string>(citizen.landHolding?.irrigationType || '');
 
   // DBT Bank Account
@@ -95,11 +103,19 @@ export const UnifiedProfileForm: React.FC<Props> = ({
     setDistrict(citizen.address?.district || '');
     setPincode(citizen.address?.pincode || '');
     setCategory(citizen.category || 'OBC');
-    setAnnualIncome(citizen.annualIncome || 0);
+    setAnnualIncome(
+      citizen.annualIncome !== undefined && citizen.annualIncome !== null && citizen.annualIncome !== 0
+        ? String(citizen.annualIncome)
+        : ''
+    );
     setRationCardType(citizen.rationCardType || 'ORANGE');
     setDisabilityStatus(citizen.disabilityStatus || 'NO');
     setGatNumber(citizen.landHolding?.gatNumber || '');
-    setAreaInAcres(citizen.landHolding?.areaInAcres || 0);
+    setAreaInAcres(
+      citizen.landHolding?.areaInAcres !== undefined && citizen.landHolding?.areaInAcres !== null && citizen.landHolding?.areaInAcres !== 0
+        ? String(citizen.landHolding.areaInAcres)
+        : ''
+    );
     setIrrigationType(citizen.landHolding?.irrigationType || '');
     setBankName(citizen.dbtBankDetails?.bankName || '');
     setAccountNumber(citizen.dbtBankDetails?.accountNumber || '');
@@ -219,11 +235,11 @@ export const UnifiedProfileForm: React.FC<Props> = ({
           pincode
         },
         category,
-        annualIncome,
+        annualIncome: annualIncome.trim() !== '' ? Number(annualIncome) : 0,
         rationCardType,
         landHolding: {
           gatNumber,
-          areaInAcres,
+          areaInAcres: areaInAcres.trim() !== '' ? Number(areaInAcres) : 0,
           irrigationType,
           village,
           taluka,
@@ -536,10 +552,11 @@ export const UnifiedProfileForm: React.FC<Props> = ({
               <input
                 type="number"
                 required
+                min="0"
                 value={annualIncome}
-                onChange={e => setAnnualIncome(Number(e.target.value))}
-                placeholder="e.g. 72000"
-                className="w-full px-3.5 py-2.5 bg-white border border-black/12 rounded-xl text-xs font-medium focus:outline-none focus:border-black transition-all font-mono"
+                onChange={e => setAnnualIncome(e.target.value)}
+                placeholder="0"
+                className="w-full px-3.5 py-2.5 bg-white border border-black/12 rounded-xl text-xs font-medium focus:outline-none focus:border-black transition-all font-mono no-spin-buttons"
               />
             </div>
 
@@ -597,15 +614,17 @@ export const UnifiedProfileForm: React.FC<Props> = ({
 
             <div>
               <label className="block text-xs font-semibold text-gray-700 mb-1">
-                Total Land Holding (एकूण जमीन क्षेत्र - एकर)
+                Total Land Holding (एकूण जमीन क्षेत्र - एकर) *
               </label>
               <input
                 type="number"
-                step="0.1"
+                step="0.01"
+                min="0"
+                required
                 value={areaInAcres}
-                onChange={e => setAreaInAcres(Number(e.target.value))}
-                placeholder="2.5"
-                className="w-full px-3.5 py-2.5 bg-white border border-black/12 rounded-xl text-xs font-medium focus:outline-none focus:border-black transition-all font-mono"
+                onChange={e => setAreaInAcres(e.target.value)}
+                placeholder="0"
+                className="w-full px-3.5 py-2.5 bg-white border border-black/12 rounded-xl text-xs font-medium focus:outline-none focus:border-black transition-all font-mono no-spin-buttons"
               />
             </div>
 

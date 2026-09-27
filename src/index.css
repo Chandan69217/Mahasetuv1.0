@@ -724,3 +724,13 @@ body.menu-open {
   background: rgba(34, 211, 238, 0.4);
 }
 
+/* Hide number input spin buttons / incrementers */
+.no-spin-buttons::-webkit-outer-spin-button,
+.no-spin-buttons::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.no-spin-buttons {
+  -moz-appearance: textfield;
+}
+
