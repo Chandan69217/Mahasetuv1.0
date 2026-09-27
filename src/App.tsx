@@ -57,7 +57,7 @@ export default function App() {
       .catch(() => {});
   }, []);
 
-  // Restore logged-in user session from localStorage on app load
+  // Restore logged-in user session from localStorage on app load and re-hydrate from database
   useEffect(() => {
     try {
       const savedUser = localStorage.getItem('mahasetu_active_user');
@@ -67,6 +67,24 @@ export default function App() {
           setCurrentUser(parsed);
           setActiveTab(parsed.role === 'officer' ? 'officer' : 'citizen');
           setIsWelcomeModalOpen(false);
+
+          // Authoritatively fetch latest profile record from database to prevent stale state on refresh
+          if (parsed.role === 'citizen') {
+            const query = new URLSearchParams();
+            if (parsed.id) query.set('id', parsed.id);
+            if (parsed.aadhaarNumber) query.set('aadhaarNumber', parsed.aadhaarNumber);
+            if (parsed.email) query.set('email', parsed.email);
+
+            fetch(`/api/citizens/profile?${query.toString()}`)
+              .then(res => res.json())
+              .then(data => {
+                if (data.success && data.citizen) {
+                  setCurrentUser(data.citizen);
+                  localStorage.setItem('mahasetu_active_user', JSON.stringify(data.citizen));
+                }
+              })
+              .catch(err => console.warn('Could not re-fetch profile from database:', err));
+          }
         }
       }
     } catch (e) {

@@ -616,62 +616,237 @@ async function startServer() {
     });
   });
 
-  // Save / Update Unified Digital Profile
-  app.post('/api/citizens/profile', (req: Request, res: Response) => {
-    const profileData = req.body;
-    const { id, aadhaarNumber } = profileData;
+  // Fetch Citizen Profile from Local Database Store or Supabase PostgreSQL
+  app.get(['/api/citizens/profile', '/api/citizens/:id'], async (req: Request, res: Response) => {
+    try {
+      const id = (req.params.id || req.query.id || '') as string;
+      const aadhaarNumber = (req.query.aadhaarNumber || req.query.aadhaar || '') as string;
+      const email = (req.query.email || '') as string;
 
-    let citizen = db.citizens.find(c => c.id === id || (aadhaarNumber && c.aadhaarNumber.replace(/[^0-9]/g, '') === aadhaarNumber.replace(/[^0-9]/g, '')));
+      const cleanUid = aadhaarNumber.replace(/[^0-9]/g, '');
+      const normalizedEmail = email.toLowerCase().trim();
 
-    if (!citizen) {
-      res.status(404).json({ success: false, error: 'Citizen session not found for Aadhaar' });
-      return;
-    }
+      // 1. Check local DB memory / disk store
+      let citizen = db.citizens.find(c =>
+        (id && c.id === id) ||
+        (cleanUid.length === 12 && c.aadhaarNumber.replace(/[^0-9]/g, '') === cleanUid) ||
+        (normalizedEmail && c.email && c.email.toLowerCase().trim() === normalizedEmail)
+      );
 
-    // Update profile fields
-    citizen.name = profileData.name || citizen.name;
-    citizen.nameMr = profileData.nameMr || citizen.nameMr;
-    citizen.gender = profileData.gender || citizen.gender;
-    citizen.dob = profileData.dob || citizen.dob;
-    citizen.phone = profileData.phone || citizen.phone;
-    citizen.email = profileData.email || citizen.email;
-    if (profileData.address) {
-      citizen.address = { ...citizen.address, ...profileData.address };
-    }
-    citizen.category = profileData.category || citizen.category;
-    citizen.annualIncome = profileData.annualIncome !== undefined ? Number(profileData.annualIncome) : citizen.annualIncome;
-    citizen.rationCardType = profileData.rationCardType || citizen.rationCardType;
-    citizen.landHolding = profileData.landHolding || citizen.landHolding;
-    citizen.dbtBankDetails = profileData.dbtBankDetails || citizen.dbtBankDetails;
-    citizen.disabilityStatus = profileData.disabilityStatus || citizen.disabilityStatus;
-    citizen.documents = profileData.documents || citizen.documents || [];
-    citizen.isProfileComplete = true;
-
-    // Sync updated citizen to Supabase
-    syncUsersToSupabase([citizen], []);
-
-    // Create Audit Log
-    const profileLog = db.createAuditLog({
-      actorUserId: citizen.id,
-      actorName: citizen.name,
-      actorRole: 'citizen',
-      action: 'AUTH_VERIFIED',
-      entityType: 'session',
-      entityId: citizen.id,
-      metadata: {
-        event: 'UNIFIED_PROFILE_SAVED',
-        annualIncome: citizen.annualIncome,
-        category: citizen.category,
-        documentsCount: citizen.documents?.length || 0
+      // 2. If not found in local DB, check Supabase PostgreSQL
+      if (!citizen) {
+        const supabase = getSupabaseClient();
+        if (supabase) {
+          try {
+            let sbQuery = supabase.from('users').select('*');
+            if (id) {
+              sbQuery = sbQuery.eq('id', toValidUuid(id));
+            } else if (normalizedEmail) {
+              sbQuery = sbQuery.eq('email', normalizedEmail);
+            }
+            const { data: sbUsers } = await sbQuery.limit(1);
+            if (sbUsers && sbUsers.length > 0) {
+              const row = sbUsers[0];
+              if (row.profile_data) {
+                citizen = row.profile_data;
+              } else {
+                citizen = {
+                  id: row.id,
+                  aadhaarNumber: row.aadhaar_masked ? row.aadhaar_masked.replace('XXXX-XXXX-', '9999 8888 ') : '9999 8888 1234',
+                  maskedAadhaar: row.aadhaar_masked || 'XXXX-XXXX-1234',
+                  name: row.name || '',
+                  phone: row.phone || '',
+                  email: row.email || normalizedEmail,
+                  gender: 'MALE',
+                  dob: '',
+                  address: {
+                    street: '',
+                    villageOrCity: '',
+                    taluka: '',
+                    district: '',
+                    state: 'Maharashtra',
+                    pincode: ''
+                  },
+                  role: 'citizen',
+                  biometricRegistered: true,
+                  registeredAt: row.created_at || new Date().toISOString(),
+                  isProfileComplete: Boolean(row.name),
+                  documents: []
+                };
+              }
+              if (citizen) {
+                db.citizens.push(citizen);
+                db.saveToDisk();
+              }
+            }
+          } catch (sbErr) {
+            console.warn('[SUPABASE] Profile lookup check warning:', sbErr);
+          }
+        }
       }
-    });
-    syncAuditLogToSupabase(profileLog);
 
-    res.json({
-      success: true,
-      message: 'Unified Digital Profile saved successfully to Maharashtra Mahasetu & Supabase DB',
-      citizen
-    });
+      if (!citizen) {
+        res.status(404).json({ success: false, error: 'Citizen profile not found' });
+        return;
+      }
+
+      res.json({
+        success: true,
+        citizen
+      });
+    } catch (err: any) {
+      res.status(500).json({ success: false, error: err?.message || 'Server error' });
+    }
+  });
+
+  // Save / Update Unified Digital Profile (Resilient Upsert with Disk Persistence & Supabase)
+  app.post('/api/citizens/profile', async (req: Request, res: Response) => {
+    try {
+      const profileData = req.body;
+      const { id, aadhaarNumber } = profileData;
+
+      const cleanUid = (aadhaarNumber || '').replace(/[^0-9]/g, '');
+      const normalizedEmail = (profileData.email || '').toLowerCase().trim();
+
+      // 1. Locate existing citizen by id, clean Aadhaar UID, or email
+      let citizen = db.citizens.find(c =>
+        (id && c.id === id) ||
+        (cleanUid.length === 12 && c.aadhaarNumber.replace(/[^0-9]/g, '') === cleanUid) ||
+        (normalizedEmail && c.email && c.email.toLowerCase().trim() === normalizedEmail)
+      );
+
+      // 2. Check Supabase if not present in memory
+      if (!citizen) {
+        const supabase = getSupabaseClient();
+        if (supabase) {
+          try {
+            let sbQuery = supabase.from('users').select('*');
+            if (id) sbQuery = sbQuery.eq('id', toValidUuid(id));
+            else if (normalizedEmail) sbQuery = sbQuery.eq('email', normalizedEmail);
+            const { data: sbUsers } = await sbQuery.limit(1);
+            if (sbUsers && sbUsers.length > 0) {
+              const row = sbUsers[0];
+              citizen = row.profile_data || {
+                id: row.id,
+                aadhaarNumber: row.aadhaar_masked ? row.aadhaar_masked.replace('XXXX-XXXX-', '9999 8888 ') : '9999 8888 1234',
+                maskedAadhaar: row.aadhaar_masked || 'XXXX-XXXX-1234',
+                name: row.name || '',
+                email: row.email || normalizedEmail,
+                phone: row.phone || '',
+                gender: 'MALE',
+                dob: '',
+                address: {
+                  street: '',
+                  villageOrCity: '',
+                  taluka: '',
+                  district: '',
+                  state: 'Maharashtra',
+                  pincode: ''
+                },
+                role: 'citizen',
+                biometricRegistered: true,
+                registeredAt: row.created_at || new Date().toISOString(),
+                isProfileComplete: false,
+                documents: []
+              };
+              if (citizen) db.citizens.push(citizen);
+            }
+          } catch (e) {}
+        }
+      }
+
+      // 3. If still not found, create new citizen record (guaranteed persistence, never 404)
+      if (!citizen) {
+        const citizenId = id || (cleanUid.length === 12 ? `c-dyn-${cleanUid}` : `c-${Date.now()}`);
+        const formattedUid = cleanUid.length === 12
+          ? `${cleanUid.slice(0, 4)} ${cleanUid.slice(4, 8)} ${cleanUid.slice(8, 12)}`
+          : (aadhaarNumber || '5489 1204 8923');
+        const maskedAadhaar = cleanUid.length === 12
+          ? `XXXX-XXXX-${cleanUid.slice(8, 12)}`
+          : (profileData.maskedAadhaar || 'XXXX-XXXX-8923');
+
+        citizen = {
+          id: citizenId,
+          aadhaarNumber: formattedUid,
+          maskedAadhaar,
+          name: profileData.name || '',
+          nameMr: profileData.nameMr || '',
+          nameHi: profileData.nameHi || '',
+          gender: profileData.gender || 'MALE',
+          dob: profileData.dob || '',
+          phone: profileData.phone || '',
+          email: normalizedEmail,
+          address: profileData.address || {
+            street: '',
+            villageOrCity: '',
+            taluka: '',
+            district: '',
+            state: 'Maharashtra',
+            pincode: ''
+          },
+          role: 'citizen',
+          photoUrl: '',
+          biometricRegistered: true,
+          registeredAt: new Date().toISOString(),
+          isProfileComplete: true,
+          documents: []
+        };
+        db.citizens.push(citizen);
+      }
+
+      // 4. Update profile fields with latest citizen input
+      citizen.name = profileData.name || citizen.name;
+      citizen.nameMr = profileData.nameMr || citizen.nameMr;
+      citizen.gender = profileData.gender || citizen.gender;
+      citizen.dob = profileData.dob || citizen.dob;
+      citizen.phone = profileData.phone || citizen.phone;
+      citizen.email = normalizedEmail || citizen.email;
+      if (profileData.address) {
+        citizen.address = { ...citizen.address, ...profileData.address };
+      }
+      citizen.category = profileData.category || citizen.category;
+      citizen.annualIncome = profileData.annualIncome !== undefined ? Number(profileData.annualIncome) : citizen.annualIncome;
+      citizen.rationCardType = profileData.rationCardType || citizen.rationCardType;
+      citizen.landHolding = profileData.landHolding || citizen.landHolding;
+      citizen.dbtBankDetails = profileData.dbtBankDetails || citizen.dbtBankDetails;
+      citizen.disabilityStatus = profileData.disabilityStatus || citizen.disabilityStatus;
+      citizen.documents = profileData.documents || citizen.documents || [];
+      citizen.isProfileComplete = true;
+
+      // 5. Commit immediately to local persistent disk store
+      db.saveToDisk();
+
+      // 6. Sync updated citizen to Supabase PostgreSQL database
+      syncUsersToSupabase([citizen], []);
+
+      // 7. Create Audit Log and commit
+      const profileLog = db.createAuditLog({
+        actorUserId: citizen.id,
+        actorName: citizen.name,
+        actorRole: 'citizen',
+        action: 'AUTH_VERIFIED',
+        entityType: 'session',
+        entityId: citizen.id,
+        metadata: {
+          event: 'UNIFIED_PROFILE_SAVED',
+          annualIncome: citizen.annualIncome,
+          category: citizen.category,
+          landHoldingAcres: citizen.landHolding?.areaInAcres || 0,
+          documentsCount: citizen.documents?.length || 0
+        }
+      });
+      db.saveToDisk();
+      syncAuditLogToSupabase(profileLog);
+
+      res.json({
+        success: true,
+        message: 'Unified Digital Profile saved successfully to Maharashtra Mahasetu & Supabase DB',
+        citizen
+      });
+    } catch (err: any) {
+      console.error('Error in /api/citizens/profile:', err);
+      res.status(500).json({ success: false, error: err?.message || 'Failed to save profile' });
+    }
   });
 
   // Officer login with strict Aadhaar + Email validation against Supabase officers table

@@ -263,10 +263,19 @@ export const UnifiedProfileForm: React.FC<Props> = ({
 
       const data = await res.json();
       if (data.success && data.citizen) {
-        setSuccessMsg('Unified Digital Profile created and synchronized with Supabase PostgreSQL DB!');
+        try {
+          localStorage.setItem('mahasetu_active_user', JSON.stringify(data.citizen));
+        } catch (e) {}
+        setSuccessMsg(
+          language === 'mr'
+            ? 'एकात्मिक डिजिटल प्रोफाईल यशस्वीरित्या डेटाबेसमध्ये जतन झाले!'
+            : language === 'hi'
+            ? 'एकीकृत डिजिटल प्रोफाइल सफलतापूर्वक डेटाबेस में सहेजा गया!'
+            : 'Unified Digital Profile saved and synchronized with Database!'
+        );
         setTimeout(() => {
           onProfileSaved(data.citizen);
-        }, 1200);
+        }, 800);
       } else {
         setErrorMsg(data.error || 'Failed to save profile. Please try again.');
       }

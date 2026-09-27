@@ -297,7 +297,7 @@ export const CitizenPortal: React.FC<Props> = ({
     }
   }, [selectedSchemeForApply]);
 
-  // Load services and existing applications
+  // Load services, fresh citizen profile, and existing applications
   const loadData = async () => {
     try {
       const srvRes = await fetch('/api/services');
@@ -307,6 +307,24 @@ export const CitizenPortal: React.FC<Props> = ({
       const appRes = await fetch(`/api/applications?citizenId=${citizen.id}`);
       const appData = await appRes.json();
       setMyApplications(appData);
+
+      // Verify and sync citizen profile with authoritative database record
+      const profileQuery = new URLSearchParams();
+      if (citizen.id) profileQuery.set('id', citizen.id);
+      if (citizen.aadhaarNumber) profileQuery.set('aadhaarNumber', citizen.aadhaarNumber);
+      if (citizen.email) profileQuery.set('email', citizen.email);
+
+      fetch(`/api/citizens/profile?${profileQuery.toString()}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.success && data.citizen && onUpdateCitizen) {
+            // Update if completed or changed
+            if (data.citizen.name && (!citizen.name || data.citizen.annualIncome !== citizen.annualIncome || data.citizen.landHolding?.areaInAcres !== citizen.landHolding?.areaInAcres)) {
+              onUpdateCitizen(data.citizen);
+            }
+          }
+        })
+        .catch(() => {});
     } catch (e) {
       console.error('Error fetching services/applications', e);
     }

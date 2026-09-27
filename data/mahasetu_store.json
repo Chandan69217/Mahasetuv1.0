@@ -1,0 +1,386 @@
+{
+  "citizens": [
+    {
+      "id": "c1111111-2222-3333-4444-555555555501",
+      "aadhaarNumber": "5489 1204 8923",
+      "maskedAadhaar": "XXXX-XXXX-8923",
+      "name": "Asha Suresh Patil",
+      "nameMr": "आशा सुरेश पाटील",
+      "nameHi": "आशा सुरेश पाटिल",
+      "gender": "FEMALE",
+      "dob": "2004-05-18",
+      "phone": "+91 98231 44520",
+      "email": "asha.patil@example.com",
+      "address": {
+        "street": "Shivaji Chowk, Lane 4",
+        "villageOrCity": "Kothrud, Pune",
+        "taluka": "Haveli",
+        "district": "Pune",
+        "state": "Maharashtra",
+        "pincode": "411038"
+      },
+      "role": "citizen",
+      "photoUrl": "",
+      "biometricRegistered": true,
+      "registeredAt": "2023-01-15T09:30:00Z"
+    },
+    {
+      "id": "c1111111-2222-3333-4444-555555555502",
+      "aadhaarNumber": "7821 9043 1120",
+      "maskedAadhaar": "XXXX-XXXX-1120",
+      "name": "Ramesh Vitthal Deshmukh",
+      "nameMr": "रमेश विठ्ठल देशमुख",
+      "nameHi": "रमेश विट्ठल देशमुख",
+      "gender": "MALE",
+      "dob": "1982-11-23",
+      "phone": "+91 94220 89123",
+      "email": "ramesh.deshmukh@example.com",
+      "address": {
+        "street": "Gat No. 142, Shetkari Nagar",
+        "villageOrCity": "Paradsinga",
+        "taluka": "Katol",
+        "district": "Nagpur",
+        "state": "Maharashtra",
+        "pincode": "441305"
+      },
+      "role": "citizen",
+      "photoUrl": "",
+      "biometricRegistered": true,
+      "registeredAt": "2022-08-10T11:20:00Z"
+    },
+    {
+      "id": "c1111111-2222-3333-4444-555555555503",
+      "aadhaarNumber": "3198 4402 7761",
+      "maskedAadhaar": "XXXX-XXXX-7761",
+      "name": "Sunita Manohar Shinde",
+      "nameMr": "सुनिता मनोहर शिंदे",
+      "nameHi": "सुनीता मनोहर शिंदे",
+      "gender": "FEMALE",
+      "dob": "1995-02-14",
+      "phone": "+91 97655 33211",
+      "email": "sunita.shinde@example.com",
+      "address": {
+        "street": "Panchavati Main Road",
+        "villageOrCity": "Nashik",
+        "taluka": "Nashik",
+        "district": "Nashik",
+        "state": "Maharashtra",
+        "pincode": "422003"
+      },
+      "role": "citizen",
+      "photoUrl": "",
+      "biometricRegistered": true,
+      "registeredAt": "2023-04-01T14:15:00Z"
+    },
+    {
+      "id": "c1111111-2222-3333-4444-555555555504",
+      "aadhaarNumber": "9012 3341 5567",
+      "maskedAadhaar": "XXXX-XXXX-5567",
+      "name": "Rajesh Baburao Gaikwad",
+      "nameMr": "राजेश बाबुराव गायकवाड",
+      "nameHi": "राजेश बाबूराव गायकवाड़",
+      "gender": "MALE",
+      "dob": "1999-07-30",
+      "phone": "+91 91588 44901",
+      "email": "rajesh.gaikwad@example.com",
+      "address": {
+        "street": "Cidco N-4",
+        "villageOrCity": "Chhatrapati Sambhajinagar",
+        "taluka": "Aurangabad",
+        "district": "Chhatrapati Sambhajinagar",
+        "state": "Maharashtra",
+        "pincode": "431003"
+      },
+      "role": "citizen",
+      "photoUrl": "",
+      "biometricRegistered": true,
+      "registeredAt": "2024-02-19T16:45:00Z"
+    },
+    {
+      "id": "c-test-101",
+      "aadhaarNumber": "9876 5432 1098",
+      "maskedAadhaar": "XXXX-XXXX-1098",
+      "name": "Rohan Kadam",
+      "nameMr": "",
+      "nameHi": "",
+      "gender": "MALE",
+      "dob": "",
+      "phone": "",
+      "email": "",
+      "address": {
+        "street": "",
+        "villageOrCity": "",
+        "taluka": "",
+        "district": "",
+        "state": "Maharashtra",
+        "pincode": ""
+      },
+      "role": "citizen",
+      "photoUrl": "",
+      "biometricRegistered": true,
+      "registeredAt": "2026-09-27T10:38:16.330Z",
+      "isProfileComplete": true,
+      "documents": [],
+      "category": "OBC",
+      "annualIncome": 85000,
+      "landHolding": {
+        "gatNumber": "GAT-555",
+        "areaInAcres": 3.75
+      }
+    },
+    {
+      "id": "c-dyn-849201993344",
+      "aadhaarNumber": "8492 0199 3344",
+      "maskedAadhaar": "XXXX-XXXX-3344",
+      "name": "Abhijit Tikone",
+      "nameMr": "अभिजीत टिकोणे",
+      "nameHi": "",
+      "gender": "MALE",
+      "dob": "1996-08-15",
+      "phone": "+91 98765 43210",
+      "email": "abhijit.test@example.com",
+      "address": {
+        "street": "Near Ganpati Temple",
+        "villageOrCity": "Khed Shivapur",
+        "taluka": "Haveli",
+        "district": "Pune",
+        "state": "Maharashtra",
+        "pincode": "412205"
+      },
+      "role": "citizen",
+      "photoUrl": "",
+      "biometricRegistered": true,
+      "registeredAt": "2026-09-27T11:01:27.005Z",
+      "isProfileComplete": true,
+      "documents": [],
+      "category": "GENERAL",
+      "annualIncome": 150000,
+      "rationCardType": "ORANGE",
+      "landHolding": {
+        "gatNumber": "MH-PUN-GAT-899",
+        "areaInAcres": 4.5,
+        "irrigationType": "Well & Drip Irrigation",
+        "village": "Khed Shivapur",
+        "taluka": "Haveli",
+        "district": "Pune"
+      },
+      "dbtBankDetails": {
+        "bankName": "Bank of Maharashtra",
+        "accountNumber": "60123456789",
+        "ifscCode": "MAHB0000123",
+        "isAadhaarSeeded": true
+      }
+    }
+  ],
+  "applications": [
+    {
+      "id": "app-90182",
+      "applicationNumber": "MH-EDU-2026-440192",
+      "citizenId": "c1111111-2222-3333-4444-555555555501",
+      "citizenName": "Asha Suresh Patil",
+      "citizenAadhaarMasked": "XXXX-XXXX-8923",
+      "serviceId": "srv-scholarship-01",
+      "serviceName": "Rajarshi Chhatrapati Shahu Maharaj Merit Scholarship",
+      "departmentCode": "EDUCATION",
+      "status": "IN_PROGRESS",
+      "formData": {
+        "collegeName": "COEP Technological University, Pune",
+        "courseName": "B.Tech Computer Engineering (Year 3)",
+        "annualTuitionFee": 85000,
+        "bankAccountMasked": "SBIN0001234 - XXXX8910",
+        "ifscCode": "SBIN0001234"
+      },
+      "verifiedProofs": [
+        {
+          "fieldCode": "INCOME_CERTIFICATE",
+          "sourceDepartment": "REVENUE",
+          "verificationStatus": "VERIFIED",
+          "certificateNumber": "INC-MH-2026-10382",
+          "validUntil": "2027-03-31",
+          "verifiedAt": "2026-09-06T09:15:22Z",
+          "canonicalPayload": {
+            "documentType": "IncomeCertificate",
+            "documentNumber": "INC-MH-2026-10382",
+            "personName": "Asha Suresh Patil",
+            "annualIncomeInr": 120000,
+            "issuingTaluka": "Haveli",
+            "district": "Pune"
+          }
+        },
+        {
+          "fieldCode": "DOMICILE_CERTIFICATE",
+          "sourceDepartment": "DISTRICT_ADMIN",
+          "verificationStatus": "VERIFIED",
+          "certificateNumber": "DOM-MH-2024-88491",
+          "validUntil": "PERMANENT",
+          "verifiedAt": "2026-09-06T09:15:24Z",
+          "canonicalPayload": {
+            "documentType": "DomicileCertificate",
+            "documentNumber": "DOM-MH-2024-88491",
+            "personName": "Asha Suresh Patil",
+            "state": "Maharashtra",
+            "district": "Pune"
+          }
+        }
+      ],
+      "consentId": "con-9901-initial-asha",
+      "createdAt": "2026-09-06T09:16:00Z",
+      "updatedAt": "2026-09-06T09:20:00Z",
+      "trackingRemarks": "Cross-department verification successful. Forwarded to Desk Officer for scholarship disbursement approval."
+    }
+  ],
+  "consents": [
+    {
+      "id": "con-9901-initial-asha",
+      "citizenId": "c1111111-2222-3333-4444-555555555501",
+      "citizenAadhaarMasked": "XXXX-XXXX-8923",
+      "citizenName": "Asha Suresh Patil",
+      "requestingDepartmentCode": "EDUCATION",
+      "sourceDepartmentCodes": [
+        "REVENUE",
+        "DISTRICT_ADMIN"
+      ],
+      "serviceId": "srv-scholarship-01",
+      "serviceName": "Rajarshi Chhatrapati Shahu Maharaj Merit Scholarship",
+      "purpose": "Verification of family income & state domicile eligibility",
+      "dataFields": [
+        "INCOME_CERTIFICATE",
+        "DOMICILE_CERTIFICATE"
+      ],
+      "grantedAt": "2026-09-06T09:15:00Z",
+      "expiresAt": "2026-09-07T09:15:00Z",
+      "status": "active",
+      "authTokenHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "dataRequests": [],
+  "auditLogs": [
+    {
+      "id": "audit-1790506887016-881",
+      "actorUserId": "c-dyn-849201993344",
+      "actorName": "Abhijit Tikone",
+      "actorRole": "citizen",
+      "action": "AUTH_VERIFIED",
+      "entityType": "session",
+      "entityId": "c-dyn-849201993344",
+      "metadata": {
+        "event": "UNIFIED_PROFILE_SAVED",
+        "annualIncome": 150000,
+        "category": "GENERAL",
+        "landHoldingAcres": 4.5,
+        "documentsCount": 0
+      },
+      "hashChain": "00000000414f6756000001a0e286e768a9b7c8d9e0f123456789abcdef012345",
+      "createdAt": "2026-09-27T11:01:27.016Z"
+    },
+    {
+      "id": "audit-1790506887007-214",
+      "actorUserId": "c-dyn-849201993344",
+      "actorName": "Aadhaar User (XXXX-XXXX-3344)",
+      "actorRole": "citizen",
+      "action": "AUTH_VERIFIED",
+      "entityType": "session",
+      "entityId": "c-dyn-849201993344",
+      "metadata": {
+        "authMethod": "AADHAAR_MOCK_FINGERPRINT",
+        "uidaiTxn": "UIDAI-MH-1790506887006-3994",
+        "qualityScore": 95,
+        "isNewProfile": true
+      },
+      "hashChain": "00000000414f6af8000001a0e286e75fa9b7c8d9e0f123456789abcdef012345",
+      "createdAt": "2026-09-27T11:01:27.007Z"
+    },
+    {
+      "id": "audit-001",
+      "actorUserId": "c1111111-2222-3333-4444-555555555501",
+      "actorName": "Asha Suresh Patil",
+      "actorRole": "citizen",
+      "action": "AUTH_VERIFIED",
+      "entityType": "session",
+      "entityId": "c1111111-2222-3333-4444-555555555501",
+      "metadata": {
+        "authMethod": "AADHAAR_BIOMETRIC_FINGERPRINT",
+        "uidaiTxn": "TXN-MH-2026-881920",
+        "nfiqScore": 92,
+        "authStatus": "SUCCESS"
+      },
+      "hashChain": "0000a98f12c4b819f0910243e8812034981fae88129038102381203812039a8f",
+      "createdAt": "2026-09-06T09:14:30Z"
+    },
+    {
+      "id": "audit-002",
+      "actorUserId": "c1111111-2222-3333-4444-555555555501",
+      "actorName": "Asha Suresh Patil",
+      "actorRole": "citizen",
+      "action": "CONSENT_GRANTED",
+      "entityType": "consent",
+      "entityId": "con-9901-initial-asha",
+      "sourceDepartment": "REVENUE",
+      "targetDepartment": "EDUCATION",
+      "metadata": {
+        "purpose": "Verification of family income & state domicile eligibility",
+        "validityHours": 24,
+        "requestedFields": [
+          "INCOME_CERTIFICATE",
+          "DOMICILE_CERTIFICATE"
+        ]
+      },
+      "hashChain": "14f09a8230948b81204981a8c081293810293801293810293810293810293810",
+      "createdAt": "2026-09-06T09:15:00Z"
+    },
+    {
+      "id": "audit-003",
+      "actorUserId": "GATEWAY_ORCHESTRATOR",
+      "actorName": "Mahasetu Interoperability Gateway",
+      "actorRole": "gateway",
+      "action": "DATA_REQUESTED",
+      "entityType": "data_request",
+      "entityId": "dr-88102",
+      "sourceDepartment": "REVENUE",
+      "targetDepartment": "EDUCATION",
+      "metadata": {
+        "adapterUrl": "/api/adapters/revenue/income-certificate/INC-MH-2026-10382",
+        "consentVerified": true
+      },
+      "hashChain": "38a9012f09812903812093812093810293810293810293810293810293810293",
+      "createdAt": "2026-09-06T09:15:10Z"
+    },
+    {
+      "id": "audit-004",
+      "actorUserId": "GATEWAY_ORCHESTRATOR",
+      "actorName": "Mahasetu Interoperability Gateway",
+      "actorRole": "gateway",
+      "action": "DATA_RETURNED",
+      "entityType": "data_request",
+      "entityId": "dr-88102",
+      "sourceDepartment": "REVENUE",
+      "targetDepartment": "EDUCATION",
+      "metadata": {
+        "canonicalDocType": "IncomeCertificate",
+        "certificateNo": "INC-MH-2026-10382",
+        "verificationStatus": "VERIFIED"
+      },
+      "hashChain": "5f91028309182309182039812039812039812039812039812039812039812039",
+      "createdAt": "2026-09-06T09:15:22Z"
+    },
+    {
+      "id": "audit-1790505496332-793",
+      "actorUserId": "c-test-101",
+      "actorName": "Rohan Kadam",
+      "actorRole": "citizen",
+      "action": "AUTH_VERIFIED",
+      "entityType": "session",
+      "entityId": "c-test-101",
+      "metadata": {
+        "event": "UNIFIED_PROFILE_SAVED",
+        "annualIncome": 85000,
+        "category": "OBC",
+        "landHoldingAcres": 3.75,
+        "documentsCount": 0
+      },
+      "hashChain": "000000006c7feb2a000001a0e271af0ca9b7c8d9e0f123456789abcdef012345",
+      "createdAt": "2026-09-27T10:38:16.332Z"
+    }
+  ],
+  "savedAt": "2026-09-27T11:01:27.016Z"
+}

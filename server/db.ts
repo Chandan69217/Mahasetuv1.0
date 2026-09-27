@@ -3,6 +3,8 @@
  * Adheres strictly to the Supabase PostgreSQL Schema in SIH26129 Blueprint Section 7.2
  */
 
+import fs from 'fs';
+import path from 'path';
 import {
   CitizenUser,
   OfficerUser,
@@ -988,6 +990,78 @@ class MahasetuDatabase {
 
   constructor() {
     this.seedInitialTransactions();
+    this.loadFromDisk();
+  }
+
+  private getStorageFilePath(): string {
+    const dataDir = path.join(process.cwd(), 'data');
+    if (!fs.existsSync(dataDir)) {
+      try {
+        fs.mkdirSync(dataDir, { recursive: true });
+      } catch (e) {
+        console.warn('Could not create data directory for db persistence:', e);
+      }
+    }
+    return path.join(dataDir, 'mahasetu_store.json');
+  }
+
+  public saveToDisk(): void {
+    try {
+      const filePath = this.getStorageFilePath();
+      const payload = {
+        citizens: this.citizens,
+        applications: this.applications,
+        consents: this.consents,
+        dataRequests: this.dataRequests,
+        auditLogs: this.auditLogs,
+        savedAt: new Date().toISOString()
+      };
+      fs.writeFileSync(filePath, JSON.stringify(payload, null, 2), 'utf-8');
+    } catch (err) {
+      console.warn('[DB STORAGE] Failed to write db state to disk:', err);
+    }
+  }
+
+  public loadFromDisk(): void {
+    try {
+      const filePath = this.getStorageFilePath();
+      if (fs.existsSync(filePath)) {
+        const raw = fs.readFileSync(filePath, 'utf-8');
+        const parsed = JSON.parse(raw);
+        if (parsed) {
+          if (Array.isArray(parsed.citizens) && parsed.citizens.length > 0) {
+            const citizenMap = new Map<string, CitizenUser>();
+            this.citizens.forEach(c => citizenMap.set(c.id, c));
+            parsed.citizens.forEach((c: CitizenUser) => citizenMap.set(c.id, c));
+            this.citizens = Array.from(citizenMap.values());
+          }
+          if (Array.isArray(parsed.applications)) {
+            const appMap = new Map<string, ApplicationRecord>();
+            this.applications.forEach(a => appMap.set(a.id, a));
+            parsed.applications.forEach((a: ApplicationRecord) => appMap.set(a.id, a));
+            this.applications = Array.from(appMap.values());
+          }
+          if (Array.isArray(parsed.consents)) {
+            const consentMap = new Map<string, ConsentRecord>();
+            this.consents.forEach(c => consentMap.set(c.id, c));
+            parsed.consents.forEach((c: ConsentRecord) => consentMap.set(c.id, c));
+            this.consents = Array.from(consentMap.values());
+          }
+          if (Array.isArray(parsed.dataRequests)) {
+            this.dataRequests = parsed.dataRequests;
+          }
+          if (Array.isArray(parsed.auditLogs) && parsed.auditLogs.length > 0) {
+            const logMap = new Map<string, AuditLog>();
+            this.auditLogs.forEach(l => logMap.set(l.id, l));
+            parsed.auditLogs.forEach((l: AuditLog) => logMap.set(l.id, l));
+            this.auditLogs = Array.from(logMap.values());
+          }
+          console.log(`[DB STORAGE] Successfully restored ${this.citizens.length} citizens and ${this.applications.length} applications from local disk store.`);
+        }
+      }
+    } catch (err) {
+      console.warn('[DB STORAGE] Could not load state from disk store:', err);
+    }
   }
 
   private seedInitialTransactions() {
@@ -1174,6 +1248,7 @@ class MahasetuDatabase {
       createdAt: timestamp
     };
     this.auditLogs.unshift(log);
+    this.saveToDisk();
     return log;
   }
 }
